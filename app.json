@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "玉桂狗日记",
+    "slug": "cinnamoroll-app",
+    "version": "1.5.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/cinnamoroll-logo.png",
+    "scheme": "cinnamoroll",
+    "userInterfaceStyle": "light",
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/your-project-id"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "splash": {
+      "image": "./assets/images/cinnamoroll-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E8F4FD"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cinnamoroll.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/cinnamoroll-logo.png",
+        "backgroundColor": "#E8F4FD"
+      },
+      "package": "com.cinnamoroll.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-updates"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
