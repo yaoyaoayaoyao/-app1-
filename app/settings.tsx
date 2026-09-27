@@ -6,6 +6,7 @@ import { ScreenWrapper } from '@/components/ScreenWrapper';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { useAuthStore } from '@/stores/auth.store';
 import { importAllSeedData, clearAllUserData } from '@/services/seed.service';
+import { exportBackup } from '@/services/backup.service';
 import { getCurrentVersion } from '@/services/update.service';
 import { useUpdateStore } from '@/stores/update.store';
 import { colors, typography, spacing, borderRadius } from '@/theme';
@@ -49,24 +50,44 @@ export default function SettingsScreen() {
   };
 
   const handleImportSeedData = () => {
-    Alert.alert('导入数据', '将导入22个习惯和153条打卡记录，确定吗？', [
-      { text: '取消', style: 'cancel' },
-      {
-        text: '导入',
-        onPress: async () => {
-          setLoadingMessage('正在导入数据...');
-          setLoading(true);
-          try {
-            const result = await importAllSeedData();
-            setLoading(false);
-            Alert.alert('导入成功！', `已导入 ${result.habits} 个习惯、${result.checkIns} 条打卡记录、${result.notes} 条便签。`);
-          } catch (e) {
-            setLoading(false);
-            Alert.alert('导入失败', (e as Error).message);
-          }
+    Alert.alert(
+      '导入示例数据',
+      '会导入 22 个示例习惯和 153 条打卡记录。\n\n注意：这一步会替换掉你现在的习惯和打卡记录（便签、饮食、心情不受影响）。\n如果你是想把自己以前的数据搬过来，请点上面的「数据搬家」。',
+      [
+        { text: '取消', style: 'cancel' },
+        {
+          text: '导入',
+          onPress: async () => {
+            setLoadingMessage('正在导入数据...');
+            setLoading(true);
+            try {
+              const result = await importAllSeedData();
+              setLoading(false);
+              Alert.alert('导入成功！', `已导入 ${result.habits} 个习惯、${result.checkIns} 条打卡记录、${result.notes} 条便签。`);
+            } catch (e) {
+              setLoading(false);
+              Alert.alert('导入失败', (e as Error).message);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
+  };
+
+  const handleExportBackup = async () => {
+    setLoadingMessage('正在打包备份...');
+    setLoading(true);
+    try {
+      const r = await exportBackup();
+      setLoading(false);
+      Alert.alert(
+        '备份已生成',
+        `文件名：${r.fileName}\n大小：约 ${Math.round(r.size / 1024)} KB\n\n可以存到网盘或发给自己，换手机时在新 App 里选这个文件就能恢复。`,
+      );
+    } catch (e) {
+      setLoading(false);
+      Alert.alert('备份失败', (e as Error).message);
+    }
   };
 
   const handleClearAllData = () => {
@@ -158,10 +179,29 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>数据管理</Text>
           <TouchableOpacity
             style={styles.menuItem}
+            onPress={() => router.push('/data-migration')}
+          >
+            <MaterialCommunityIcons name="truck-delivery-outline" size={22} color={colors.primary} />
+            <View style={styles.menuItemBody}>
+              <Text style={styles.menuText}>数据搬家</Text>
+              <Text style={styles.menuSubText}>从别的地方把打卡记录搬过来 / 导出备份</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textHint} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={handleExportBackup}
+          >
+            <MaterialCommunityIcons name="export" size={22} color={colors.accentWarm} />
+            <Text style={styles.menuText}>导出全部数据备份</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textHint} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
             onPress={handleImportSeedData}
           >
             <MaterialCommunityIcons name="download" size={22} color={colors.accentMint} />
-            <Text style={styles.menuText}>导入 22 个习惯 + 153 条打卡记录</Text>
+            <Text style={styles.menuText}>导入示例数据（22 个习惯）</Text>
             <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textHint} />
           </TouchableOpacity>
           <TouchableOpacity
@@ -275,5 +315,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.divider,
   },
   menuText: { ...typography.body1, color: colors.textPrimary, flex: 1 },
+  menuItemBody: { flex: 1 },
+  menuSubText: { ...typography.caption, color: colors.textHint, marginTop: 2 },
   menuValue: { ...typography.body2, color: colors.textHint },
 });
