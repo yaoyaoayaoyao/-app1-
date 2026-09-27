@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useUpdateStore, reloadApp } from '@/stores/update.store';
+import { useUpdateStore } from '@/stores/update.store';
 import { colors, typography, spacing, borderRadius, shadows } from '@/theme';
 
 interface UpdateModalProps {
@@ -23,13 +23,15 @@ export function UpdateModal({ visible, onClose }: UpdateModalProps) {
   const downloadProgress = useUpdateStore((s) => s.downloadProgress);
   const isDownloaded = useUpdateStore((s) => s.isDownloaded);
   const applyUpdate = useUpdateStore((s) => s.applyUpdate);
+  const installUpdate = useUpdateStore((s) => s.installUpdate);
+  const installMessage = useUpdateStore((s) => s.installMessage);
 
   const handleApplyUpdate = async () => {
     await applyUpdate();
   };
 
-  const handleRestart = async () => {
-    await reloadApp();
+  const handleInstall = async () => {
+    await installUpdate();
   };
 
   const handleClose = () => {
@@ -95,10 +97,12 @@ export function UpdateModal({ visible, onClose }: UpdateModalProps) {
           )}
 
           {/* 下载完成提示 */}
-          {isDownloaded && !isDownloading && (
+          {isDownloaded && !isDownloading && installMessage && (
             <View style={styles.readySection}>
-              <MaterialCommunityIcons name="check-circle" size={20} color={colors.success} />
-              <Text style={styles.readyText}>更新已就绪</Text>
+              <MaterialCommunityIcons name="alert-circle" size={20} color={colors.error} />
+              <Text style={[styles.readyText, { color: colors.error }]}>
+                {installMessage}
+              </Text>
             </View>
           )}
 
@@ -107,11 +111,11 @@ export function UpdateModal({ visible, onClose }: UpdateModalProps) {
             {isDownloaded ? (
               <TouchableOpacity
                 style={styles.primaryButton}
-                onPress={handleRestart}
+                onPress={handleInstall}
                 activeOpacity={0.8}
               >
-                <MaterialCommunityIcons name="restart" size={20} color="#FFF" />
-                <Text style={styles.primaryButtonText}>重启应用</Text>
+                <MaterialCommunityIcons name="cellphone-arrow-down" size={20} color="#FFF" />
+                <Text style={styles.primaryButtonText}>安装更新</Text>
               </TouchableOpacity>
             ) : isDownloading ? (
               <View style={[styles.primaryButton, styles.primaryButtonDisabled]}>
