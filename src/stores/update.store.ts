@@ -4,8 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   checkForUpdate,
   downloadUpdate,
+  installUpdate as doInstall,
   getCurrentVersion,
-  reloadApp,
 } from '@/services/update.service';
 
 export interface UpdateInfo {
@@ -25,10 +25,12 @@ interface UpdateState {
   downloadProgress: number;
   isDownloaded: boolean;
   isDismissed: boolean;
+  installMessage: string | null;
 
   // 操作
   checkUpdate: (silent?: boolean) => Promise<void>;
   applyUpdate: () => Promise<void>;
+  installUpdate: () => Promise<void>;
   dismissUpdate: () => void;
   resetDismiss: () => void;
 }
@@ -45,6 +47,7 @@ export const useUpdateStore = create<UpdateState>()(
       downloadProgress: 0,
       isDownloaded: false,
       isDismissed: false,
+      installMessage: null,
 
       checkUpdate: async (silent = false) => {
         if (get().isChecking) return;
@@ -59,7 +62,7 @@ export const useUpdateStore = create<UpdateState>()(
               hasUpdate: true,
               updateInfo: {
                 version: result.latestEntry.version,
-                changes: result.changes || result.latestEntry.changes,
+                changes: result.changelog || result.latestEntry.changes,
                 date: result.latestEntry.date,
               },
               lastCheckTime: now,
@@ -103,6 +106,12 @@ export const useUpdateStore = create<UpdateState>()(
         }
       },
 
+      installUpdate: async () => {
+        set({ installMessage: null });
+        const result = await doInstall();
+        set({ installMessage: result.success ? null : result.message });
+      },
+
       dismissUpdate: () => {
         set({ isDismissed: true });
       },
@@ -123,5 +132,4 @@ export const useUpdateStore = create<UpdateState>()(
   ),
 );
 
-// 导出 reloadApp 供组件使用
-export { reloadApp };
+// installUpdate 已在本 store 提供，不再导出 reloadApp
