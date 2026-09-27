@@ -25,7 +25,7 @@ export async function importAllSeedData(): Promise<{
   const userId = 'local_user';
 
   // 为种子数据替换 userId
-  const habits: Habit[] = seedHabits.map((h) => ({ ...h, userId }));
+  const habits: Habit[] = seedHabits.map((h) => ({ ...h, userId, mode: h.mode ?? 'required' }));
   const checkIns: CheckInRecord[] = seedCheckIns.map((c) => ({ ...c, userId }));
   const notes: Note[] = seedNotes.map((n) => ({ ...n, userId }));
 
