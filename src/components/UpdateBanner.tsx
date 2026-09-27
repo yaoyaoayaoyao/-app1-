@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useUpdateStore, reloadApp } from '@/stores/update.store';
+import { useUpdateStore } from '@/stores/update.store';
 import { colors, typography, spacing, borderRadius, shadows } from '@/theme';
 
 // Android 需要手动启用 LayoutAnimation
